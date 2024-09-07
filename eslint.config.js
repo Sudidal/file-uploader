@@ -10,7 +10,13 @@ export default [
   eslintConfigPrettier,
   {
     rules: {
-      "no-unused-vars": "warn",
+      "no-unused-vars": [
+        "warn",
+        {
+          args: "none",
+        },
+      ],
+      "no-empty": "warn",
     },
   },
 ];
