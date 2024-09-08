@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 import configurePassport from "./passportConfig.js";
+import passport from "passport";
 import process from "node:process";
 import express from "express";
 import session from "express-session";
@@ -15,6 +16,8 @@ const PORT = process.env.PORT;
 
 const app = express();
 
+app.set("view engine", "ejs");
+
 app.use(
   session({
     cookie: {
@@ -29,13 +32,18 @@ app.use(
     }),
   })
 );
-
-app.use(express.urlencoded({ extended: false }));
-app.set("view engine", "ejs");
+app.use(passport.session());
 
 app.locals.views = views;
 
-app.use("/", baseRouter);
+app.use(express.urlencoded({ extended: false }));
+app.use("/", [
+  (req, res, next) => {
+    res.locals.user = req.user;
+    next();
+  },
+  baseRouter,
+]);
 
 app.listen(PORT, () => {
   console.log(
