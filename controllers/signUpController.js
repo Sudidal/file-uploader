@@ -2,14 +2,15 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { body, validationResult, matchedData } from "express-validator";
 import validators from "../validators.js";
+import views from "../views/views.js";
 
 const prisma = new PrismaClient();
 
 class SignUpController {
   constructor() {}
   async signUpGet(req, res, next) {
-    res.render(res.locals.views.layout, {
-      page: res.locals.views.signup,
+    res.render(views.layout, {
+      page: views.signup,
       params: {},
     });
   }

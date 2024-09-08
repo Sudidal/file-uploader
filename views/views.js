@@ -4,6 +4,7 @@ class Views {
   layout = "layout";
   index = "index";
   signup = "signup";
+  login = "login";
 }
 
 const views = new Views();

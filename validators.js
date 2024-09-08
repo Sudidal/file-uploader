@@ -6,12 +6,12 @@ class Validators {
   constructor() {}
 
   async isUserNotExist(value) {
-    const rows = await prisma.user.findFirst({
+    const user = await prisma.user.findFirst({
       where: {
         username: value,
       },
     });
-    if (rows) throw new Error();
+    if (user) throw new Error();
     else return true;
   }
 }

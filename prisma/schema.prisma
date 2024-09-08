@@ -14,10 +14,17 @@ datasource db {
 }
 
 model User {
-  id  Int @id @default(autoincrement())
-  username  String  @db.VarChar(255)
-  password  String
-  role  Role  @default(USER)
+  id       Int    @id @default(autoincrement())
+  username String @db.VarChar(255)
+  password String
+  role     Role   @default(USER)
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String   @db.VarChar(255)
+  expiresAt DateTime
 }
 
 enum Role {
