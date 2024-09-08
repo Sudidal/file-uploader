@@ -12,12 +12,11 @@ export default function configurePassport() {
 
   passport.deserializeUser(async (id, done) => {
     try {
-      const rows = await prisma.user.findUnique({
+      const user = await prisma.user.findFirst({
         where: {
           id: id,
         },
       });
-      const user = rows[0];
       done(null, user);
     } catch (err) {
       done(err);
@@ -26,7 +25,6 @@ export default function configurePassport() {
 
   passport.use(
     new localStrategy(async (username, password, done) => {
-      console.log(username);
       try {
         const user = await prisma.user.findFirst({
           where: {
@@ -34,13 +32,11 @@ export default function configurePassport() {
           },
         });
         if (!user) {
-          console.log("username");
           return done(null, false, { messages: "Username not found" });
         }
         try {
           const match = await bcrypt.compare(password, user.password);
           if (!match) {
-            console.log("password");
             return done(null, false, { messages: "Incorrect password" });
           }
           return done(null, user);
