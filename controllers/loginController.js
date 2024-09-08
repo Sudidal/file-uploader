@@ -9,7 +9,8 @@ class LoginController {
   }
   loginPost = [
     passport.authenticate("local", {
-      // failureMessage: true,
+      failureMessage: true,
+      successMessage: true,
       successRedirect: "/",
       failureRedirect: "/login",
     }),
