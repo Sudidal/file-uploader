@@ -4,6 +4,9 @@ class IndexController {
   constructor() {}
 
   indexGet(req, res, next) {
+    if (!req.user) {
+      return res.redirect("/login");
+    }
     res.render(views.layout, {
       page: views.index,
       params: {},
