@@ -18,6 +18,7 @@ model User {
   username String @db.VarChar(255)
   password String
   role     Role   @default(USER)
+  folders Folder[]
   files File[]
 }
 
@@ -27,13 +28,22 @@ model Session {
   data      String   @db.VarChar(255)
   expiresAt DateTime
 }
+model Folder {
+  id  Int @id @default(autoincrement())
+  name  String  @db.VarChar(255)
+  userId Int
+  user  User @relation(fields: [userId], references: [id])
+  files File[]
+}
 model File {
   id  Int @id @default(autoincrement())
   name  String  @db.VarChar(255)
   uploadDate  DateTime
   fileSize  String  @db.VarChar(100)
-  uploaderId  Int
-  uploader  User  @relation(fields: [uploaderId], references: [id])
+  userId  Int @map("uploaderId")
+  user  User  @relation(fields: [userId], references: [id])
+  folderId Int
+  folder  Folder @relation(fields: [folderId], references: [id])
 }
 
 enum Role {
