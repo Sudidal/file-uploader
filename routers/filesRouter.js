@@ -3,6 +3,7 @@ import filesController from "../controllers/filesController.js";
 
 const router = express.Router();
 
-router.get("/", filesController.filesGet);
+router.get("/view", filesController.filesViewGet);
+router.get("/view/:folderId", filesController.filesViewGet);
 
 export { router as filesRouter };

@@ -6,14 +6,27 @@ const prisma = new PrismaClient();
 class FilesController {
   constructor() {}
 
-  async filesGet(req, res, next) {
+  async filesViewGet(req, res, next) {
+    // Prisma accepts int as id input
+    // prisma outputs null if a column is empty
+    let folderId = parseInt(req.params.folderId) || null;
+    console.log(folderId);
+
     const user = await prisma.user.findUnique({
       where: {
         id: req.user.id,
       },
       include: {
-        folders: true,
-        files: true,
+        folders: {
+          where: {
+            parentFolderId: folderId,
+          },
+        },
+        files: {
+          where: {
+            folderId: folderId,
+          },
+        },
       },
     });
     if (!user) {
@@ -25,6 +38,12 @@ class FilesController {
       params: { folders: user.folders, files: user.files },
     });
   }
+}
+
+function getDirFromPathFragments(pathArr) {
+  // I'm an absolute idiot, i was trying for 2 hours to get the path from the
+  // list of ids in the url.. why in the fuck do i need to put a list in the url
+  // just put the folder id XDDDDDDDD, that's it
 }
 
 const filesController = new FilesController();
