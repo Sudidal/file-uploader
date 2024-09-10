@@ -1,0 +1,5 @@
+<h2>Welcome, <%= params.username %></h2>
+<h3>Your storage</h3>
+<div>
+  <%- include(locals.views.fileNodeList, {params: params}) %>
+</div>
