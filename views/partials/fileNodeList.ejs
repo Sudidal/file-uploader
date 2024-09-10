@@ -1,5 +1,5 @@
 <% locals.params.folders.forEach(folder => { %>
-    <p><%= folder.name %></p>
+    <div><a href="/files/<%= folder.id %>"><%= folder.name %></a></div>
 <% }) %> <% locals.params.files.forEach(file => { %>
     <p><%= file.name %></p>
 <% }) %>

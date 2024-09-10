@@ -17,6 +17,8 @@ const PORT = process.env.PORT;
 
 const app = express();
 
+app.locals.views = views;
+
 app.set("view engine", "ejs");
 
 app.use(
@@ -34,10 +36,8 @@ app.use(
   })
 );
 app.use(passport.session());
-
-app.locals.views = views;
-
 app.use(express.urlencoded({ extended: false }));
+
 app.use("/", [
   (req, res, next) => {
     res.locals.user = req.user;

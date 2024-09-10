@@ -7,7 +7,7 @@ class Views {
 
   //----------------  Pages
   layout = this.#rootPath + "/views/layout";
-  index = this.#rootPath + "/views/index";
+  files = this.#rootPath + "/views/files";
   signup = this.#rootPath + "/views/signup";
   login = this.#rootPath + "/views/login";
 
