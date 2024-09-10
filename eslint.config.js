@@ -17,6 +17,7 @@ export default [
         },
       ],
       "no-empty": "warn",
+      "no-unused-private-class-members": "warn",
     },
   },
 ];
