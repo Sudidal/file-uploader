@@ -10,7 +10,8 @@ router.use("/signup", [redirectAuthenticated, signUpRouter]);
 router.use("/login", [redirectAuthenticated, loginRouter]);
 router.use("/logout", [redirectUnAuthenticated, logoutRouter]);
 router.use("/files", [redirectUnAuthenticated, filesRouter]);
-router.use("/", (req, res, next) => {
+
+router.all("/", (req, res, next) => {
   res.redirect("/files");
 });
 

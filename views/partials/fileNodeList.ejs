@@ -1,5 +1,33 @@
 <% locals.params.folders.forEach(folder => { %>
-    <div><a href="/files/<%= folder.id %>"><%= folder.name %></a></div>
+    <div class="folder-card">
+        <a href="/files/<%= folder.id %>"><%= folder.name %></a>
+        <form action="/files/update_folder/<%= folder.id %>"" method="post">
+            <div class="field">
+                <label for="folderName">Rename</label>
+                <input type="text" id="folderName" name="folderName" placeholder="Enter folder name" required>
+            </div>
+            <div class="field">
+                <label for="parentId">Change location</label>
+                <input type="text" id="parentId" name="parentId" placeholder="Enter parent id" required>
+            </div>
+            <button type="submit">Update</button>
+        </form>
+        <a href="/files/delete_folder/<%= folder.id %>">Delete Folder</a>
+    </div>
 <% }) %> <% locals.params.files.forEach(file => { %>
-    <p><%= file.name %></p>
+    <div class="file-card">
+        <span><%= file.name %></span>
+        <form action="/files/update_file/<%= file.id %>" method="post">
+            <div class="field">
+                <label for="fileName">Rename</label>
+                <input type="text" id="fileName" name="fileName" placeholder="Enter file name" required>
+            </div>
+            <div class="field">
+                <label for="parentId">Change location</label>
+                <input type="text" id="parentId" name="parentId" placeholder="Enter parent id" required>
+            </div>
+            <button type="submit">Update</button>
+        </form>
+        <a href="/files/delete_file/<%= file.id %>">Delete File</a>
+    </div>
 <% }) %>

@@ -47,7 +47,7 @@ class FilesController {
     });
   }
 
-  async foldersPost(req, res, next) {
+  async newFolderPost(req, res, next) {
     let folderId = parseInt(req.params.folderId) || null;
     await prisma.folder.create({
       data: {
@@ -58,7 +58,7 @@ class FilesController {
     });
     res.redirect("/");
   }
-  filesPost = [
+  newFilePost = [
     upload.single("file"),
     async (req, res, next) => {
       console.log("hiiiiiiiiii");
@@ -76,6 +76,52 @@ class FilesController {
       res.redirect("/");
     },
   ];
+
+  async updateFolderPost(req, res, next) {
+    let folderId = parseInt(req.params.folderId) || null;
+    await prisma.folder.update({
+      where: {
+        id: folderId,
+      },
+      data: {
+        name: req.body.folderName,
+        parentFolderId: parseInt(req.body.parentId),
+      },
+    });
+    res.redirect("/");
+  }
+  async updateFilePost(req, res, next) {
+    let fileId = parseInt(req.params.fileId) || null;
+    await prisma.file.update({
+      where: {
+        id: fileId,
+      },
+      data: {
+        name: req.body.fileName,
+        folderId: parseInt(req.body.parentId),
+      },
+    });
+    res.redirect("/");
+  }
+
+  async deleteFolderGet(req, res, next) {
+    let folderId = parseInt(req.params.folderId) || null;
+    await prisma.folder.delete({
+      where: {
+        id: folderId,
+      },
+    });
+    res.redirect("/");
+  }
+  async deleteFileGet(req, res, next) {
+    let fileId = parseInt(req.params.fileId) || null;
+    await prisma.file.delete({
+      where: {
+        id: fileId,
+      },
+    });
+    res.redirect("/");
+  }
 }
 
 const filesController = new FilesController();
