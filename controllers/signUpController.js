@@ -3,7 +3,13 @@ import bcrypt from "bcryptjs";
 import { body, validationResult, matchedData } from "express-validator";
 import validators from "../validators.js";
 import views from "../views/views.js";
+import { createClient } from "@supabase/supabase-js";
+import process from "node:process";
 
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 const prisma = new PrismaClient();
 
 class SignUpController {
@@ -27,17 +33,32 @@ class SignUpController {
       try {
         const hashedPassword = await bcrypt.hash(validatedData.password, 10);
         try {
-          await prisma.user.create({
+          const createdUser = await prisma.user.create({
             data: {
               username: validatedData.username,
               password: hashedPassword,
             },
           });
+          const { data, error } = await supabase.storage.createBucket(
+            createdUser.username + createdUser.id,
+            {
+              public: false,
+              fileSizeLimit: 30000, // 1000 * 30 = 30 MegaBytes
+            }
+          );
+          if (error) {
+            prisma.user.delete({
+              where: {
+                id: createdUser.id,
+              },
+            });
+            throw new Error(error);
+          }
         } catch (err) {
-          console.log(err);
+          next(err);
         }
       } catch (err) {
-        console.log(err);
+        next(err);
       }
       res.redirect("/login");
     },

@@ -1,9 +1,15 @@
 import views from "../views/views.js";
 import multer from "multer";
 import { PrismaClient } from "@prisma/client";
+import { createClient } from "@supabase/supabase-js";
+import process from "node:process";
+import { getPathByFolderId } from "../utils/fullFolderPath.js";
 
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 const upload = multer({ dest: "uploads/" });
-
 const prisma = new PrismaClient();
 
 class FilesController {
@@ -61,7 +67,7 @@ class FilesController {
   newFilePost = [
     upload.single("file"),
     async (req, res, next) => {
-      console.log("hiiiiiiiiii");
+      console.log(typeof req.file);
       console.log(req.file);
       let folderId = parseInt(req.params.folderId) || null;
       await prisma.file.create({
@@ -73,6 +79,13 @@ class FilesController {
           userId: req.user.id,
         },
       });
+      const path = await getPathByFolderId(folderId);
+      const { data, error } = supabase.storage
+        .from(req.user.username + req.user.id)
+        .upload(`${path}/${req.file.originalname}`, req.file);
+      if (error) {
+        return next(error);
+      }
       res.redirect("/");
     },
   ];
@@ -84,23 +97,34 @@ class FilesController {
         id: folderId,
       },
       data: {
-        name: req.body.folderName,
-        parentFolderId: parseInt(req.body.parentId),
+        name: req.body.newFolderName,
+        parentFolderId: parseInt(req.body.newFolderId),
       },
     });
     res.redirect("/");
   }
   async updateFilePost(req, res, next) {
     let fileId = parseInt(req.params.fileId) || null;
+    const file = await prisma.file.findFirst({
+      where: {
+        id: fileId,
+      },
+    });
     await prisma.file.update({
       where: {
         id: fileId,
       },
       data: {
-        name: req.body.fileName,
-        folderId: parseInt(req.body.parentId),
+        name: req.body.newFileName,
+        folderId: parseInt(req.body.newFolderId),
       },
     });
+    const oldPath = await getPathByFolderId(file.folderId);
+    const newPath = await getPathByFolderId(parseInt(req.body.newFolderId));
+    console.log("gong to: " + newPath);
+    supabase.storage
+      .from(req.user.username + req.user.id)
+      .move(`${oldPath}/${file.name}`, `${newPath}/${req.body.newFileName}`);
     res.redirect("/");
   }
 
@@ -115,11 +139,23 @@ class FilesController {
   }
   async deleteFileGet(req, res, next) {
     let fileId = parseInt(req.params.fileId) || null;
+    const file = await prisma.file.findFirst({
+      where: {
+        id: fileId,
+      },
+    });
     await prisma.file.delete({
       where: {
         id: fileId,
       },
     });
+    const path = await getPathByFolderId(file.folderId);
+    const { data, error } = supabase.storage
+      .from(req.user.username + req.user.id)
+      .remove(`${path}/${file.name}`);
+    if (error) {
+      return next(error);
+    }
     res.redirect("/");
   }
 }

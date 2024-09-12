@@ -3,12 +3,12 @@
         <a href="/files/<%= folder.id %>"><%= folder.name %></a>
         <form action="/files/update_folder/<%= folder.id %>"" method="post">
             <div class="field">
-                <label for="folderName">Rename</label>
-                <input type="text" id="folderName" name="folderName" placeholder="Enter folder name" required>
+                <label for="newFolderName">Rename</label>
+                <input type="text" id="newFolderName" name="newFolderName" placeholder="Enter folder name" required>
             </div>
             <div class="field">
-                <label for="parentId">Change location</label>
-                <input type="text" id="parentId" name="parentId" placeholder="Enter parent id" required>
+                <label for="newFolderId">Change location</label>
+                <input type="text" id="newFolderId" name="newFolderId" placeholder="Enter parent id" required>
             </div>
             <button type="submit">Update</button>
         </form>
@@ -19,12 +19,12 @@
         <span><%= file.name %></span>
         <form action="/files/update_file/<%= file.id %>" method="post">
             <div class="field">
-                <label for="fileName">Rename</label>
-                <input type="text" id="fileName" name="fileName" placeholder="Enter file name" required>
-            </div>
+                <label for="newFileName">Rename</label>
+                <input type="text" id="newFileName" name="newFileName" placeholder="Enter file name" required>
+            </div>;
             <div class="field">
-                <label for="parentId">Change location</label>
-                <input type="text" id="parentId" name="parentId" placeholder="Enter parent id" required>
+                <label for="newFolderId">Change location</label>
+                <input type="text" id="newFolderId" name="newFolderId" placeholder="Enter parent id" required>
             </div>
             <button type="submit">Update</button>
         </form>

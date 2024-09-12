@@ -8,7 +8,6 @@ import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { PrismaClient } from "@prisma/client";
 import views from "./views/views.js";
 import { baseRouter } from "./routers/baseRouter.js";
-import { createClient } from "@supabase/supabase-js";
 
 config();
 configurePassport();
