@@ -24,6 +24,4 @@ router.get("/delete_folder/:folderId", filesController.deleteFolderGet);
 
 router.get("/delete_file/:fileId", filesController.deleteFileGet);
 
-router.get("/download/:fileId", filesController.downloadFileGet);
-
 export { router as filesRouter };

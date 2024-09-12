@@ -3,13 +3,8 @@ import bcrypt from "bcryptjs";
 import { body, validationResult, matchedData } from "express-validator";
 import validators from "../validators.js";
 import views from "../views/views.js";
-import { createClient } from "@supabase/supabase-js";
-import process from "node:process";
+import fileStorage from "../fileStorage.js";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
 const prisma = new PrismaClient();
 
 class SignUpController {
@@ -39,21 +34,8 @@ class SignUpController {
               password: hashedPassword,
             },
           });
-          const { data, error } = await supabase.storage.createBucket(
-            createdUser.username + createdUser.id,
-            {
-              public: true,
-              fileSizeLimit: 20000, // 1000 * 20 = 20 MegaBytes
-            }
-          );
-          if (error) {
-            prisma.user.delete({
-              where: {
-                id: createdUser.id,
-              },
-            });
-            throw new Error(error);
-          }
+
+          fileStorage.createBucket(createdUser.id, true, 1000000 * 20); //20MB
         } catch (err) {
           next(err);
         }

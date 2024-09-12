@@ -1,14 +1,8 @@
 import views from "../views/views.js";
 import multer from "multer";
 import { PrismaClient } from "@prisma/client";
-import { createClient } from "@supabase/supabase-js";
-import process from "node:process";
-import { getPathByFolderId } from "../utils/fullFolderPath.js";
+import fileStorage from "../fileStorage.js";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
 const upload = multer({ storage: multer.memoryStorage() });
 const prisma = new PrismaClient();
 
@@ -19,7 +13,6 @@ class FilesController {
     // Prisma accepts int as id input
     // prisma outputs null if a column is empty
     let folderId = parseInt(req.params.folderId) || null;
-    console.log(folderId);
 
     const user = await prisma.user.findUnique({
       where: {
@@ -41,11 +34,9 @@ class FilesController {
     if (!user) {
       next(new Error("Cannot access user data"));
     }
-    console.log(user.folders);
     res.render(views.layout, {
       page: views.files,
       params: {
-        username: user.username,
         folderId: folderId,
         folders: user.folders,
         files: user.files,
@@ -64,6 +55,7 @@ class FilesController {
     });
     res.redirect("/");
   }
+
   newFilePost = [
     upload.single("file"),
     async (req, res, next) => {
@@ -78,23 +70,21 @@ class FilesController {
           downloadUrl: "",
         },
       });
-      const { data, error } = supabase.storage
-        .from(req.user.username + req.user.id)
-        .upload(newFile.id.toString(), req.file.buffer);
-      const fileUrl = supabase.storage
-        .from(req.user.username + req.user.id)
-        .getPublicUrl(newFile.id.toString(), { download: true }).data.publicUrl;
+
+      await fileStorage.uploadFile(req.user.id, newFile.id, req.file.buffer);
+      const fileDownloadUrl = await fileStorage.getEternaleDownloadUrl(
+        req.user.id,
+        newFile.id
+      );
+
       await prisma.file.update({
         where: {
           id: newFile.id,
         },
         data: {
-          downloadUrl: fileUrl,
+          downloadUrl: fileDownloadUrl,
         },
       });
-      if (error) {
-        return next(error);
-      }
       res.redirect("/");
     },
   ];
@@ -114,7 +104,7 @@ class FilesController {
   }
   async updateFilePost(req, res, next) {
     let fileId = parseInt(req.params.fileId) || null;
-    const file = await prisma.file.findFirst({
+    await prisma.file.findFirst({
       where: {
         id: fileId,
       },
@@ -128,13 +118,6 @@ class FilesController {
         folderId: parseInt(req.body.newFolderId),
       },
     });
-    const oldPath = await getPathByFolderId(file.folderId);
-    const newPath = await getPathByFolderId(parseInt(req.body.newFolderId));
-    console.log("gong to: " + newPath);
-    supabase.storage
-      .from(req.user.username + req.user.id)
-      .move(`${oldPath}/${file.name}`, `${newPath}/${req.body.newFileName}`);
-    res.redirect("/");
   }
 
   async deleteFolderGet(req, res, next) {
@@ -148,7 +131,7 @@ class FilesController {
   }
   async deleteFileGet(req, res, next) {
     let fileId = parseInt(req.params.fileId) || null;
-    const file = await prisma.file.findFirst({
+    await prisma.file.findFirst({
       where: {
         id: fileId,
       },
@@ -158,22 +141,8 @@ class FilesController {
         id: fileId,
       },
     });
-    const path = await getPathByFolderId(file.folderId);
-    const { data, error } = supabase.storage
-      .from(req.user.username + req.user.id)
-      .remove(`${path}/${file.name}`);
-    if (error) {
-      return next(error);
-    }
+    await fileStorage.deleteFile(req.user.id, fileId);
     res.redirect("/");
-  }
-
-  async downloadFileGet(req, res, next) {
-    let fileId = req.params.fileId || null;
-    const { data, error } = await supabase.storage
-      .from(req.user.username + req.user.id)
-      .download(fileId);
-    res.sendFile(data);
   }
 }
 
