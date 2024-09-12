@@ -42,8 +42,8 @@ class SignUpController {
           const { data, error } = await supabase.storage.createBucket(
             createdUser.username + createdUser.id,
             {
-              public: false,
-              fileSizeLimit: 30000, // 1000 * 30 = 30 MegaBytes
+              public: true,
+              fileSizeLimit: 20000, // 1000 * 20 = 20 MegaBytes
             }
           );
           if (error) {

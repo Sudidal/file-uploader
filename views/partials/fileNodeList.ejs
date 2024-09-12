@@ -21,7 +21,7 @@
             <div class="field">
                 <label for="newFileName">Rename</label>
                 <input type="text" id="newFileName" name="newFileName" placeholder="Enter file name" required>
-            </div>;
+            </div>
             <div class="field">
                 <label for="newFolderId">Change location</label>
                 <input type="text" id="newFolderId" name="newFolderId" placeholder="Enter parent id" required>
@@ -29,5 +29,6 @@
             <button type="submit">Update</button>
         </form>
         <a href="/files/delete_file/<%= file.id %>">Delete File</a>
+        <a href=<%= file.downloadUrl %>>Download File</a>
     </div>
 <% }) %>

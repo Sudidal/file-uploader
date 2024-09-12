@@ -9,7 +9,7 @@ const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
 );
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ storage: multer.memoryStorage() });
 const prisma = new PrismaClient();
 
 class FilesController {
@@ -67,22 +67,31 @@ class FilesController {
   newFilePost = [
     upload.single("file"),
     async (req, res, next) => {
-      console.log(typeof req.file);
-      console.log(req.file);
       let folderId = parseInt(req.params.folderId) || null;
-      await prisma.file.create({
+      const newFile = await prisma.file.create({
         data: {
           name: req.file.originalname,
           uploadDate: new Date().toISOString(),
           fileSize: req.file.size / 1000000 + "MB",
           folderId: folderId,
           userId: req.user.id,
+          downloadUrl: "",
         },
       });
-      const path = await getPathByFolderId(folderId);
       const { data, error } = supabase.storage
         .from(req.user.username + req.user.id)
-        .upload(`${path}/${req.file.originalname}`, req.file);
+        .upload(newFile.id.toString(), req.file.buffer);
+      const fileUrl = supabase.storage
+        .from(req.user.username + req.user.id)
+        .getPublicUrl(newFile.id.toString(), { download: true }).data.publicUrl;
+      await prisma.file.update({
+        where: {
+          id: newFile.id,
+        },
+        data: {
+          downloadUrl: fileUrl,
+        },
+      });
       if (error) {
         return next(error);
       }
@@ -157,6 +166,14 @@ class FilesController {
       return next(error);
     }
     res.redirect("/");
+  }
+
+  async downloadFileGet(req, res, next) {
+    let fileId = req.params.fileId || null;
+    const { data, error } = await supabase.storage
+      .from(req.user.username + req.user.id)
+      .download(fileId);
+    res.sendFile(data);
   }
 }
 
