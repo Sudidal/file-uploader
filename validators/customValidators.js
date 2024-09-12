@@ -1,9 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import { body } from "express-validator";
 
 const prisma = new PrismaClient();
 
-class Validators {
+class CustomValidators {
   constructor() {}
 
   async isUserNotExist(value) {
@@ -17,5 +16,5 @@ class Validators {
   }
 }
 
-const validators = new Validators();
-export default validators;
+const customValidators = new CustomValidators();
+export default customValidators;

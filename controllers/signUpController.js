@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { body, validationResult, matchedData } from "express-validator";
-import validationChanes from "../validationChanes.js";
+import validationChanes from "../validators/validationChanes.js";
 import views from "../views/views.js";
-import fileStorage from "../fileStorage.js";
+import fileStorage from "../storage/fileStorage.js";
 
 const prisma = new PrismaClient();
 

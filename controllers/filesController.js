@@ -1,7 +1,7 @@
 import views from "../views/views.js";
 import multer from "multer";
 import { PrismaClient } from "@prisma/client";
-import fileStorage from "../fileStorage.js";
+import fileStorage from "../storage/fileStorage.js";
 import {
   getFileIdReqParamAsInt,
   getFolderIdReqParamAsInt,

@@ -1,5 +1,5 @@
 import { body } from "express-validator";
-import validators from "./validators.js";
+import customValidators from "./customValidators.js";
 
 class ValidationChanes {
   constructor() {}
@@ -11,7 +11,7 @@ class ValidationChanes {
       .isLength({ min: 1, max: 50 })
       .withMessage("Username must be between 1 and 50 characters")
       .bail()
-      .custom(validators.isUserNotExist)
+      .custom(customValidators.isUserNotExist)
       .withMessage("Username already exist"),
     body("password")
       .isString()
