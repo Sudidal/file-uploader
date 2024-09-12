@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { body, validationResult, matchedData } from "express-validator";
-import validators from "../validators.js";
+import validationChanes from "../validationChanes.js";
 import views from "../views/views.js";
 import fileStorage from "../fileStorage.js";
 
@@ -16,7 +16,7 @@ class SignUpController {
     });
   }
   signUpPost = [
-    validateSignUp,
+    validationChanes.userSignUp(),
     async (req, res, next) => {
       const validationsErrs = validationResult(req);
       if (!validationsErrs.isEmpty()) {
@@ -46,30 +46,6 @@ class SignUpController {
     },
   ];
 }
-
-const validateSignUp = [
-  body("username")
-    .isString()
-    .trim()
-    .isLength({ min: 1, max: 50 })
-    .withMessage("Username must be between 1 and 50 characters")
-    .bail()
-    .custom(validators.isUserNotExist)
-    .withMessage("Username already exist"),
-  body("password")
-    .isString()
-    .trim()
-    .notEmpty()
-    .withMessage("Password can not be empty"),
-  body("confirm_password")
-    .isString()
-    .trim()
-    .notEmpty()
-    .custom((value, { req }) => {
-      return req.body.password === req.body.confirm_password;
-    })
-    .withMessage("Passwords do not match"),
-];
 
 const signUpController = new SignUpController();
 export default signUpController;

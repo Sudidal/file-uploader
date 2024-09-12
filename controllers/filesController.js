@@ -35,9 +35,6 @@ class FilesController {
         },
       },
     });
-    if (!user) {
-      next(new Error("Cannot access user data"));
-    }
     res.render(views.layout, {
       page: views.files,
       params: {
