@@ -2,6 +2,10 @@ import views from "../views/views.js";
 import multer from "multer";
 import { PrismaClient } from "@prisma/client";
 import fileStorage from "../fileStorage.js";
+import {
+  getFileIdReqParamAsInt,
+  getFolderIdReqParamAsInt,
+} from "../utils/requestProperties.js";
 
 const upload = multer({ storage: multer.memoryStorage() });
 const prisma = new PrismaClient();
@@ -12,7 +16,7 @@ class FilesController {
   async filesGet(req, res, next) {
     // Prisma accepts int as id input
     // prisma outputs null if a column is empty
-    let folderId = parseInt(req.params.folderId) || null;
+    let folderId = getFolderIdReqParamAsInt(req);
 
     const user = await prisma.user.findUnique({
       where: {
@@ -45,7 +49,7 @@ class FilesController {
   }
 
   async newFolderPost(req, res, next) {
-    let folderId = parseInt(req.params.folderId) || null;
+    let folderId = getFolderIdReqParamAsInt(req);
     await prisma.folder.create({
       data: {
         name: req.body.folderName,
@@ -59,7 +63,7 @@ class FilesController {
   newFilePost = [
     upload.single("file"),
     async (req, res, next) => {
-      let folderId = parseInt(req.params.folderId) || null;
+      let folderId = getFolderIdReqParamAsInt(req);
       const newFile = await prisma.file.create({
         data: {
           name: req.file.originalname,
@@ -90,7 +94,7 @@ class FilesController {
   ];
 
   async updateFolderPost(req, res, next) {
-    let folderId = parseInt(req.params.folderId) || null;
+    let folderId = getFolderIdReqParamAsInt(req);
     await prisma.folder.update({
       where: {
         id: folderId,
@@ -103,7 +107,7 @@ class FilesController {
     res.redirect("/");
   }
   async updateFilePost(req, res, next) {
-    let fileId = parseInt(req.params.fileId) || null;
+    let fileId = getFileIdReqParamAsInt(req);
     await prisma.file.findFirst({
       where: {
         id: fileId,
@@ -121,7 +125,7 @@ class FilesController {
   }
 
   async deleteFolderGet(req, res, next) {
-    let folderId = parseInt(req.params.folderId) || null;
+    let folderId = getFolderIdReqParamAsInt(req);
     await prisma.folder.delete({
       where: {
         id: folderId,
@@ -129,13 +133,9 @@ class FilesController {
     });
     res.redirect("/");
   }
+
   async deleteFileGet(req, res, next) {
-    let fileId = parseInt(req.params.fileId) || null;
-    await prisma.file.findFirst({
-      where: {
-        id: fileId,
-      },
-    });
+    let fileId = getFileIdReqParamAsInt(req);
     await prisma.file.delete({
       where: {
         id: fileId,
