@@ -1,0 +1,15 @@
+<div class="folder-card">
+  <a href="/files/<%= params.folder.id %>"><%= params.folder.name %></a>
+  <form action="/files/update_folder/<%= params.folder.id %>"" method="post">
+      <div class="field">
+          <label for="newFolderName">Rename</label>
+          <input type="text" id="newFolderName" name="newFolderName" placeholder="Enter folder name" required>
+      </div>
+      <div class="field">
+          <label for="newFolderId">Change location</label>
+          <input type="text" id="newFolderId" name="newFolderId" placeholder="Enter parent id" required>
+      </div>
+      <button type="submit">Update</button>
+  </form>
+  <a href="/files/delete_folder/<%= params.folder.id %>">Delete Folder</a>
+</div>

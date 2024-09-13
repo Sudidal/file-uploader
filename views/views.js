@@ -13,6 +13,8 @@ class Views {
 
   //----------------  Partials
   fileNodeList = this.#rootPath + "/views/partials/fileNodeList";
+  fileCard = this.#rootPath + "/views/partials/fileCard";
+  folderCard = this.#rootPath + "/views/partials/folderCard";
 }
 
 const views = new Views();
