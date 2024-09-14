@@ -1,7 +1,8 @@
 import views from "../views/views.js";
 import multer from "multer";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import fileStorage from "../storage/fileStorage.js";
+import rawPSQLQueries from "../rawQueries/rawPSQLQueries.js";
 import {
   getFileIdReqParamAsInt,
   getFolderIdReqParamAsInt,
@@ -18,29 +19,22 @@ class FilesController {
     // prisma outputs null if a column is empty
     let folderId = getFolderIdReqParamAsInt(req);
 
-    const user = await prisma.user.findUnique({
-      where: {
-        id: req.user.id,
-      },
-      include: {
-        folders: {
-          where: {
-            parentFolderId: folderId,
-          },
-        },
-        files: {
-          where: {
-            folderId: folderId,
-          },
-        },
-      },
-    });
+    const folders =
+      await prisma.$queryRaw`SELECT * FROM "Folder" WHERE "userId" = ${req.user.id} AND "parentFolderId" = ${folderId}`;
+
+    const filesQuery = Prisma.raw(
+      rawPSQLQueries.getFilesFormattedSizeWithTimeAgo()
+    );
+    filesQuery.values = [req.user.id, folderId];
+    const files = await prisma.$queryRaw(filesQuery);
+
+    console.log(files);
     res.render(views.layout, {
       page: views.files,
       params: {
         folderId: folderId,
-        folders: user.folders,
-        files: user.files,
+        folders: folders,
+        files: files,
       },
     });
   }
@@ -65,7 +59,7 @@ class FilesController {
         data: {
           name: req.file.originalname,
           uploadDate: new Date().toISOString(),
-          fileSize: req.file.size / 1000000 + "MB",
+          sizeInKB: req.file.size / 1000,
           folderId: folderId,
           userId: req.user.id,
           downloadUrl: "",
